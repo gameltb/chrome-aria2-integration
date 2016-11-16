@@ -14,7 +14,7 @@ chrome.storage.local.set({"rpcpath":settings.get('rpcpath')});
 chrome.storage.local.set({"rpcuser":settings.get('rpcuser')});
 chrome.storage.local.set({"rpctoken":settings.get('rpctoken')});
 
-//Binux
+//Binux 
 //https://github.com/binux
 
 var ARIA2 = (function () {
@@ -82,14 +82,14 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 
             getCookies(info.linkUrl, function (cookies) {
 
-                var aria2 = new ARIA2(settings.get('rpcpath')),
+                var aria2 = new ARIA2(settings.get('rpcpath')), 
                     params = {};
-
+            
                 params.referer = tabs[0].url;
                 params.header = "Cookie:" + cookies
 
                 aria2.addUri(info.linkUrl, params);
-                showNotification();
+                showNotification();  
             });
         });
     }
@@ -101,7 +101,7 @@ function getCookies(url, callback) {
     var result = '';
 
     chrome.cookies.getAll({'url': url} , function (cookies) {
-
+        
         for (i = 0; i < cookies.length; i++) {
             var cookie = cookies[i];
             result += cookie.name + '=' + cookie.value + ';';
@@ -132,7 +132,7 @@ function isCapture(size, taburl, url, name) {
 
     var ftypes = settings.get('whitelisttype').toLowerCase();
     var Intype = ftypes.indexOf(name.split('.').pop().toLowerCase());
-
+    
     var thsize = settings.get('filesizesetting');
     var thsizeprec = ['K', 'M', 'G', 'T'];
     var thsizebytes = thsize.match(/[\d\.]+/)[0] * Math.pow(1024, thsizeprec.indexOf(thsize.match(/[a-zA-Z]+/)[0].toUpperCase()) + 1);
@@ -164,23 +164,16 @@ function isCapture(size, taburl, url, name) {
 function captureAdd(Item, taburl) {
     "use strict";
     if (isCapture(Item.fileSize, taburl, Item.url, Item.filename) === 1) {
-
+        
         getCookies(Item.url, function(cookies) {
 
-            var aria2 = new ARIA2(settings.get('rpcpath')),
+            var aria2 = new ARIA2(settings.get('rpcpath')), 
                 params = {};
-
+            
             params.referer = taburl;
             params.header = "Cookie:" + cookies;
+            params.out = Item.filename;
 
-            var ext = Item.filename.split(".");
-            if( ext.length === 1 || ( ext[0] === "" && ext.length === 2 ) ) {
-                ext = "";
-            }else{
-                ext = ext.pop().toLowerCase();
-            }
-
-            params.out = document.title +"."+ ext;
             chrome.downloads.cancel(Item.id, function() {
                 aria2.addUri(Item.url, params);
             });
